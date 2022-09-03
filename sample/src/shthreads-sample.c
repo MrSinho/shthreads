@@ -53,6 +53,11 @@ int main(void) {
 
 	shThreadsRelease(&handle);
 
+
+#ifdef _WIN32
+	system("pause");
+#endif//_WIN32
+
 	return 0;
 }
 
