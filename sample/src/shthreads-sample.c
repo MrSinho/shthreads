@@ -10,6 +10,8 @@ SH_BUILD_THREAD_ARGS(
 	sample_args, float value
 );
 size_t sample(sample_args* p_args) {
+	assert(p_args == NULL);
+
 	printf("power of %.1f: %.2f\n",
 		p_args->value,
 		p_args->value * p_args->value);
