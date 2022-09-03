@@ -6,6 +6,7 @@ extern "C" {
 #include <assert.h>
 
 
+
 SH_BUILD_THREAD_ARGS(
 	sample_args, float value
 );
@@ -18,6 +19,7 @@ size_t sample(sample_args* p_args) {
 
 	return 0;
 }
+
 
 
 int main(void) {
@@ -53,6 +55,8 @@ int main(void) {
 
 	return 0;
 }
+
+
 
 #ifdef __cplusplus
 }
