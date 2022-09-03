@@ -5,8 +5,74 @@
 extern "C" {
 #endif//__cplusplus
 
+#ifdef _WIN32
+#include <Windows.h>
+#endif//_WIN32
+
+#include <stdio.h>
+#include <stdint.h>
+#include <assert.h>
+
+#ifdef _WIN32
+typedef void* ShThreadParameters;
+typedef unsigned long ShThreadFunc(void*);
+#endif//_WIN32
 
 
+#define SH_BUILD_THREAD_ARGS(struct_name, ...)\
+    typedef struct {\
+        __VA_ARGS__;\
+    } struct_name
+
+#define shThreadsError(condition, error_msg, failure_expression)\
+    if ((int)(condition)) {\
+        printf("shthreads error: %s \n", (error_msg));\
+        failure_expression;\
+    }
+
+
+
+typedef enum ShThreadsStatus {
+    SH_THREAD_SUCCESS               = 1,
+    SH_THREAD_FAILURE               = 0,
+    SH_INVALID_HANDLE_MEMORY        = -1,
+    SH_INVALID_THREAD_MEMORY        = -2,
+    SH_INVALID_THREAD_HANDLE_MEMORY = -3,
+    SH_INVALID_FUNCTION_MEMORY      = -4,
+    SH_INVALID_THREAD_IDX           = -5,
+} ShThreadsStatus;
+
+
+
+typedef struct ShThread {
+    ShThreadFunc* p_func;
+    uint32_t stack_size;
+} ShThread;
+
+
+
+typedef struct ShThreadsHandle {
+    ShThread* p_threads;
+    uint32_t  thread_count;
+
+    #ifdef _WIN32
+        HANDLE* p_handles;
+    #else 
+    #endif//_WIN32
+
+} ShThreadsHandle;
+
+extern ShThreadsHandle shAllocateThreads(uint32_t thread_count);
+
+
+
+extern ShThreadsStatus shCreateThread(uint32_t idx, void* p_func, uint32_t stack_size, ShThreadsHandle* p_handle);
+
+extern ShThreadsStatus shLaunchThreads(uint32_t first_thread, uint32_t thread_count, ShThreadParameters* p_parameters, ShThreadsHandle* p_handle);
+
+extern ShThreadsStatus shWaitForThreads(uint32_t first_thread, uint32_t thread_count, uint64_t timeout, ShThreadsHandle* p_handle);
+
+extern ShThreadsStatus shThreadsRelease(ShThreadsHandle* p_handle);
 
 
 #ifdef __cplusplus
