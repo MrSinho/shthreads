@@ -28,9 +28,14 @@ endfunction()
 #||||SAMPLES||||
 #||||       ||||
 function(build_shthreads_sample)
-add_executable(shthreads-sample sample/src/shthreads-sample.c)
+
+add_executable(shthreads-sample samples/src/shthreads-sample.c)
 target_link_libraries(shthreads-sample PUBLIC shthreads)
-set_target_properties(shthreads-sample PROPERTIES
+
+add_executable(shthreads-sample-mutex samples/src/shthreads-sample-mutex.c)
+target_link_libraries(shthreads-sample-mutex PUBLIC shthreads)
+
+set_target_properties(shthreads-sample shthreads-sample-mutex PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin
     VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/bin
 )
@@ -40,7 +45,7 @@ endfunction()
 #||||     ||||
 #||||FLAGS||||
 #||||     ||||
-option(SH_THREADS_BUILD_SAMPLE CACHE OFF)
+option(SH_THREADS_BUILD_SAMPLES CACHE OFF)
 
 
 
@@ -49,9 +54,9 @@ option(SH_THREADS_BUILD_SAMPLE CACHE OFF)
 #||||    ||||
 function(main)
 build_shthreads()
-if (SH_THREADS_BUILD_SAMPLE)
+if (SH_THREADS_BUILD_SAMPLES)
 build_shthreads_sample()
-endif(SH_THREADS_BUILD_SAMPLE)
+endif(SH_THREADS_BUILD_SAMPLES)
 endfunction()
 
 

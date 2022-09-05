@@ -13,11 +13,11 @@ extern "C" {
 #include <stdint.h>
 #include <assert.h>
 
-#ifdef _WIN32
 typedef void* ShThreadParameters;
+#ifdef _WIN32
 typedef unsigned long ShThreadFunc(void*);
+typedef HANDLE ShMutex;
 #endif//_WIN32
-
 
 #define SH_BUILD_THREAD_ARGS(struct_name, ...)\
     typedef struct {\
@@ -33,13 +33,14 @@ typedef unsigned long ShThreadFunc(void*);
 
 
 typedef enum ShThreadsStatus {
-    SH_THREAD_SUCCESS               = 1,
-    SH_THREAD_FAILURE               = 0,
+    SH_THREADS_SUCCESS              = 1,
+    SH_THREADS_FAILURE              = 0,
     SH_INVALID_HANDLE_MEMORY        = -1,
     SH_INVALID_THREAD_MEMORY        = -2,
     SH_INVALID_THREAD_HANDLE_MEMORY = -3,
     SH_INVALID_FUNCTION_MEMORY      = -4,
     SH_INVALID_THREAD_IDX           = -5,
+    SH_INVALID_MUTEX_MEMORY         = -6,
 } ShThreadsStatus;
 
 
@@ -47,6 +48,7 @@ typedef enum ShThreadsStatus {
 typedef struct ShThread {
     ShThreadFunc* p_func;
     uint32_t stack_size;
+    uint64_t thread_id;
 } ShThread;
 
 
@@ -55,12 +57,23 @@ typedef struct ShThreadsHandle {
     ShThread* p_threads;
     uint32_t  thread_count;
 
-    #ifdef _WIN32
-        HANDLE* p_handles;
-    #else 
-    #endif//_WIN32
+#ifdef _WIN32
+    HANDLE* p_handles;
+#else 
+#endif//_WIN32
+
+    uint32_t mutex_count;
+    ShMutex* p_mutexes;
 
 } ShThreadsHandle;
+
+#ifdef _WIN32
+#define shGetCurrentThreadId()\
+    (uint64_t)GetCurrentThreadId()
+#else
+#endif//_WIN32
+
+
 
 extern ShThreadsHandle shAllocateThreads(uint32_t thread_count);
 
@@ -73,6 +86,17 @@ extern ShThreadsStatus shLaunchThreads(uint32_t first_thread, uint32_t thread_co
 extern ShThreadsStatus shWaitForThreads(uint32_t first_thread, uint32_t thread_count, uint64_t timeout, ShThreadsHandle* p_handle);
 
 extern ShThreadsStatus shThreadsRelease(ShThreadsHandle* p_handle);
+
+
+
+extern ShMutex* shCreateMutexes(uint32_t mutex_count, ShThreadsHandle* p_handle);
+
+
+
+extern ShThreadsStatus shWaitForMutexes(uint32_t first_mutex, uint32_t mutex_count, uint32_t timeout, ShMutex* p_mutexes);
+
+extern ShThreadsStatus shUnlockMutexes(uint32_t first_mutex, uint32_t mutex_count, ShMutex* p_mutexes);
+
 
 
 #ifdef __cplusplus
