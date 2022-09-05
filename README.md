@@ -21,6 +21,6 @@ cmake .. #-DSH_THREADS_BUILD_SAMPLES=ON
 
 To build the samples, set on the cmake option `SH_THREADS_BUILD_SAMPLES`. 
 
-See [/samples/src/](samples/src/) to find the samples source code:
+See [/samples/src/](samples/src/) to find some reference source code:
  * [shthreads-sample.c](samples/src/shthreads-sample.c);
  * [shthreads-sample-mutex.c](samples/src/shthreads-sample-mutex.c).
