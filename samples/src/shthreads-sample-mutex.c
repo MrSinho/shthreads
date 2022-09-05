@@ -21,7 +21,7 @@ void* sample(sample_args* p_args) {
 		shGetCurrentThreadId()
 	);
 
-	for (; p_args->value < 1000000; p_args->value++) {
+	for (;p_args->value < 1000000;) {
 
 		ShThreadsStatus status = shWaitForMutexes(0, 1, UINT64_MAX, &p_args->mutex);
 		assert(status == SH_THREADS_SUCCESS);
@@ -31,10 +31,10 @@ void* sample(sample_args* p_args) {
 			p_args->value,
 			p_args->value
 		);
+		p_args->value++;
 
 		status = shUnlockMutexes(0, 1, &p_args->mutex);
 		assert(status == SH_THREADS_SUCCESS);
-
 	}
 
 	return NULL;
