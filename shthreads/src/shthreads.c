@@ -144,13 +144,14 @@ ShThreadsStatus shUnlockMutexes(uint32_t first_mutex, uint32_t mutex_count, ShMu
     shThreadsError(p_mutexes == NULL, "invalid mutexes memory", return SH_INVALID_MUTEX_MEMORY);
 
 #ifdef _WIN32
+    uint32_t unlock_status = 0;
     for (uint32_t mutex_idx = first_mutex; mutex_idx < (first_mutex + mutex_count); mutex_idx++) {
-        ReleaseMutex(p_mutexes[mutex_idx]);
+        unlock_status += (uint32_t)ReleaseMutex(p_mutexes[mutex_idx]);
     }
 #else
 #endif//_WIN32
 
-    return SH_THREADS_SUCCESS;
+    return unlock_status == mutex_count ? SH_THREADS_SUCCESS : SH_MUTEX_UNLOCK_FAILURE;
 }
 
 
