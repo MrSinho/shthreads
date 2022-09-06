@@ -100,6 +100,15 @@ extern ShThreadsStatus shUnlockMutexes(uint32_t first_mutex, uint32_t mutex_coun
 
 
 
+#ifndef shSleep
+#ifdef _WIN32
+#define shThreadsSleep(i_milliseconds) Sleep((DWORD)(i_milliseconds))
+#else
+#define shThreadsSleep(i_milliseconds) usleep((i_milliseconds) * 1000)
+#endif//_WIN32
+#endif//shSleep
+
+
 #ifdef __cplusplus
 }
 #endif//_cplusplus
