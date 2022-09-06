@@ -79,7 +79,6 @@ int main(void) {
 	sample_args        args_0        = { 2, p_mutexes[0] };  //shared memory block { uint64_t value, ShMutex mutex }
 	ShThreadParameters parameters[2] = { &args_0, &args_0 }; //use same memory for both threads
 
-
 	//           //
 	//RUN THREADS//
 	//           //
@@ -90,18 +89,21 @@ int main(void) {
 	//                   //
 	//WAIT END OF THREADS//
 	//                   //
-	status = shWaitForThreads(0, 2, UINT64_MAX, &handle);
-	assert(status == SH_THREADS_SUCCESS);
+	uint64_t return_values[2] = { 0 };
+	status                    = shWaitForThreads(0, 2, UINT64_MAX, return_values, &handle);
+	assert(status            == SH_THREADS_SUCCESS);
 
-
+	//                                //
+	//CLOSE THREADS AND RELEASE MEMORY//
+	//                                //
 	shThreadsRelease(&handle);
-
 
 
 
 #ifdef _WIN32
 	system("pause");
 #endif//_WIN32
+
 
 
 	return 0;

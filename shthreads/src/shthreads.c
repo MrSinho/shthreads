@@ -49,7 +49,7 @@ ShThreadsStatus shLaunchThreads(uint32_t first_thread, uint32_t thread_count, Sh
             (LPTHREAD_START_ROUTINE)p_thread->p_func,
             p_parameters[thread_idx],
             0,
-            (LPDWORD)&p_thread->thread_id
+            (LPDWORD)&p_thread->id
         );
         shThreadsError((*p_thread_handle) == NULL, "invalid thread handle memory", return SH_INVALID_THREAD_HANDLE_MEMORY);
     }
@@ -59,7 +59,7 @@ ShThreadsStatus shLaunchThreads(uint32_t first_thread, uint32_t thread_count, Sh
     return SH_THREADS_SUCCESS;
 }
 
-ShThreadsStatus shWaitForThreads(uint32_t first_thread, uint32_t thread_count, uint64_t timeout, ShThreadsHandle* p_handle) {
+ShThreadsStatus shWaitForThreads(uint32_t first_thread, uint32_t thread_count, uint64_t timeout, uint64_t* p_exit_codes, ShThreadsHandle* p_handle) {
     shThreadsError(p_handle == NULL, "invalid thread memory", return SH_INVALID_HANDLE_MEMORY);
 #ifdef _WIN32
     DWORD status = WaitForMultipleObjects(
@@ -69,6 +69,9 @@ ShThreadsStatus shWaitForThreads(uint32_t first_thread, uint32_t thread_count, u
         (DWORD)timeout
     );
     shThreadsError(status < WAIT_OBJECT_0 || status > (DWORD)((uint32_t)WAIT_OBJECT_0 + thread_count - 1), "failed waiting for threads", return SH_THREADS_FAILURE);
+    for (uint32_t thread_idx = first_thread; thread_idx < (first_thread + thread_count); thread_idx++) {
+        GetExitCodeThread(p_handle->p_handles[thread_idx], (LPDWORD)&p_exit_codes[thread_idx]);
+    }
 #else
 #endif//_WIN32
     

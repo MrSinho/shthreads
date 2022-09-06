@@ -35,6 +35,9 @@ target_link_libraries(shthreads-sample PUBLIC shthreads)
 add_executable(shthreads-sample-mutex samples/src/shthreads-sample-mutex.c)
 target_link_libraries(shthreads-sample-mutex PUBLIC shthreads)
 
+add_executable(shthreads-sample-semaphore samples/src/shthreads-sample-semaphore.c)
+target_link_libraries(shthreads-sample-semaphore PUBLIC shthreads)
+
 set_target_properties(shthreads-sample shthreads-sample-mutex PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin
     VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/bin

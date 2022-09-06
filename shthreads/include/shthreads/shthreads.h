@@ -48,8 +48,8 @@ typedef enum ShThreadsStatus {
 
 typedef struct ShThread {
     ShThreadFunc* p_func;
-    uint32_t stack_size;
-    uint64_t thread_id;
+    uint32_t      stack_size;
+    uint64_t      id;
 } ShThread;
 
 
@@ -84,7 +84,7 @@ extern ShThreadsStatus shCreateThread(uint32_t idx, void* p_func, uint32_t stack
 
 extern ShThreadsStatus shLaunchThreads(uint32_t first_thread, uint32_t thread_count, ShThreadParameters* p_parameters, ShThreadsHandle* p_handle);
 
-extern ShThreadsStatus shWaitForThreads(uint32_t first_thread, uint32_t thread_count, uint64_t timeout, ShThreadsHandle* p_handle);
+extern ShThreadsStatus shWaitForThreads(uint32_t first_thread, uint32_t thread_count, uint64_t timeout, uint64_t* p_exit_codes, ShThreadsHandle* p_handle);
 
 extern ShThreadsStatus shThreadsRelease(ShThreadsHandle* p_handle);
 
