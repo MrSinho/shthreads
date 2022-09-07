@@ -61,6 +61,8 @@ ShThreadsStatus shLaunchThreads(uint32_t first_thread, uint32_t thread_count, Sh
 
 ShThreadsStatus shWaitForThreads(uint32_t first_thread, uint32_t thread_count, uint64_t timeout, uint64_t* p_exit_codes, ShThreadsHandle* p_handle) {
     shThreadsError(p_handle == NULL, "invalid thread memory", return SH_INVALID_HANDLE_MEMORY);
+    shThreadsError(p_exit_codes == NULL, "invalid exit codes memory", return SH_INVALID_EXIT_CODE_MEMORY);
+
 #ifdef _WIN32
     DWORD status = WaitForMultipleObjects(
         thread_count,
@@ -76,6 +78,23 @@ ShThreadsStatus shWaitForThreads(uint32_t first_thread, uint32_t thread_count, u
 #endif//_WIN32
     
     return SH_THREADS_SUCCESS;
+}
+
+#ifdef _MSC_VER
+#pragma warning (disable: 6258)
+#endif//_MSC_VER
+ShThreadsStatus shKillThreads(uint32_t first_thread, uint32_t thread_count, ShThreadsHandle* p_handle) {
+    shThreadsError(p_handle == NULL, "invalid thread memory", return SH_INVALID_HANDLE_MEMORY);
+
+#ifdef _WIN32
+    uint32_t killed = 0;
+    for (uint32_t thread_idx = first_thread; thread_idx < (first_thread + thread_count); thread_idx++) {
+        killed += (uint32_t)TerminateThread(p_handle->p_handles[thread_idx], 0);
+    }
+#else
+#endif//_WIN32
+
+    return killed == thread_count;
 }
 
 ShThreadsStatus shThreadsRelease(ShThreadsHandle* p_handle) {

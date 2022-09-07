@@ -42,6 +42,7 @@ typedef enum ShThreadsStatus {
     SH_INVALID_THREAD_IDX           = -5,
     SH_INVALID_MUTEX_MEMORY         = -6,
     SH_MUTEX_UNLOCK_FAILURE         = -7,
+    SH_INVALID_EXIT_CODE_MEMORY     = -8,
 } ShThreadsStatus;
 
 
