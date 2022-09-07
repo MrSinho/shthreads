@@ -59,7 +59,29 @@ ShThreadsStatus shLaunchThreads(uint32_t first_thread, uint32_t thread_count, Sh
     return SH_THREADS_SUCCESS;
 }
 
-ShThreadsStatus shWaitForThreads(uint32_t first_thread, uint32_t thread_count, uint64_t timeout, uint64_t* p_exit_codes, ShThreadsHandle* p_handle) {
+ShThreadsStatus shGetThreadState(uint32_t thread_idx, ShThreadState* p_state, ShThreadsHandle* p_handle) {
+    shThreadsError(p_state == NULL, "invalid thread state memory", return SH_INVALID_THREAD_STATE_MEMORY);
+
+#ifdef _WIN32
+    DWORD status = WaitForSingleObject(p_handle->p_handles[thread_idx], 0);
+    switch (status) {
+    case WAIT_OBJECT_0:
+        (*p_state) = SH_THREAD_RETURNED;
+        return SH_THREADS_SUCCESS;
+    case WAIT_TIMEOUT:
+        (*p_state) = SH_THREAD_RUNNING;
+        return SH_THREADS_SUCCESS;
+    default:
+        (*p_state) = SH_THREAD_INVALID_STATE;
+        return SH_THREAD_STATE_FAILURE;
+    }
+#else
+#endif//_WIN32
+
+    return SH_THREADS_SUCCESS;
+}
+
+ShThreadsStatus shWaitForThreads(uint32_t first_thread, uint32_t thread_count, uint64_t ms_timeout, uint64_t* p_exit_codes, ShThreadsHandle* p_handle) {
     shThreadsError(p_handle == NULL, "invalid thread memory", return SH_INVALID_HANDLE_MEMORY);
     shThreadsError(p_exit_codes == NULL, "invalid exit codes memory", return SH_INVALID_EXIT_CODE_MEMORY);
 
@@ -68,7 +90,7 @@ ShThreadsStatus shWaitForThreads(uint32_t first_thread, uint32_t thread_count, u
         thread_count,
         &p_handle->p_handles[first_thread],
         1,
-        (DWORD)timeout
+        (DWORD)ms_timeout
     );
     shThreadsError(status < WAIT_OBJECT_0 || status > (DWORD)((uint32_t)WAIT_OBJECT_0 + thread_count - 1), "failed waiting for threads", return SH_THREADS_FAILURE);
     for (uint32_t thread_idx = first_thread; thread_idx < (first_thread + thread_count); thread_idx++) {
@@ -83,18 +105,13 @@ ShThreadsStatus shWaitForThreads(uint32_t first_thread, uint32_t thread_count, u
 #ifdef _MSC_VER
 #pragma warning (disable: 6258)
 #endif//_MSC_VER
-ShThreadsStatus shKillThreads(uint32_t first_thread, uint32_t thread_count, ShThreadsHandle* p_handle) {
-    shThreadsError(p_handle == NULL, "invalid thread memory", return SH_INVALID_HANDLE_MEMORY);
-
+ShThreadsStatus shExitCurrentThread(uint32_t return_value) {
 #ifdef _WIN32
-    uint32_t killed = 0;
-    for (uint32_t thread_idx = first_thread; thread_idx < (first_thread + thread_count); thread_idx++) {
-        killed += (uint32_t)TerminateThread(p_handle->p_handles[thread_idx], 0);
-    }
+    ExitThread(return_value);
 #else
 #endif//_WIN32
 
-    return killed == thread_count;
+    return SH_THREADS_SUCCESS;
 }
 
 ShThreadsStatus shThreadsRelease(ShThreadsHandle* p_handle) {
@@ -145,7 +162,7 @@ ShMutex* shCreateMutexes(uint32_t mutex_count, ShThreadsHandle* p_handle) {
     return p_handle->p_mutexes;
 }
 
-ShThreadsStatus shWaitForMutexes(uint32_t first_mutex, uint32_t mutex_count, uint32_t timeout, ShMutex* p_mutexes) {
+ShThreadsStatus shWaitForMutexes(uint32_t first_mutex, uint32_t mutex_count, uint32_t ms_timeout, ShMutex* p_mutexes) {
     shThreadsError(p_mutexes == NULL, "invalid mutexes memory", return SH_INVALID_MUTEX_MEMORY);
 
 #ifdef _WIN32
@@ -153,7 +170,7 @@ ShThreadsStatus shWaitForMutexes(uint32_t first_mutex, uint32_t mutex_count, uin
         mutex_count,
         p_mutexes,
         TRUE,
-        timeout
+        ms_timeout
     );
     shThreadsError(status < WAIT_OBJECT_0 || status > (DWORD)((uint32_t)WAIT_OBJECT_0 + mutex_count - 1), "failed waiting for mutexes", return SH_THREADS_FAILURE);
 #else

@@ -31,10 +31,16 @@ typedef HANDLE ShMutex;
     }
 
 
+typedef enum ShThreadState {
+    SH_THREAD_RUNNING       =  2,
+    SH_THREAD_RETURNED      =  1,
+    SH_THREAD_INVALID_STATE = -1,
+} ShThreadState;
+
 
 typedef enum ShThreadsStatus {
-    SH_THREADS_SUCCESS              = 1,
-    SH_THREADS_FAILURE              = 0,
+    SH_THREADS_SUCCESS              =  1,
+    SH_THREADS_FAILURE              =  0,
     SH_INVALID_HANDLE_MEMORY        = -1,
     SH_INVALID_THREAD_MEMORY        = -2,
     SH_INVALID_THREAD_HANDLE_MEMORY = -3,
@@ -43,6 +49,8 @@ typedef enum ShThreadsStatus {
     SH_INVALID_MUTEX_MEMORY         = -6,
     SH_MUTEX_UNLOCK_FAILURE         = -7,
     SH_INVALID_EXIT_CODE_MEMORY     = -8,
+    SH_INVALID_THREAD_STATE_MEMORY  = -9,
+    SH_THREAD_STATE_FAILURE         = -10,
 } ShThreadsStatus;
 
 
@@ -84,6 +92,10 @@ extern ShThreadsHandle shAllocateThreads(uint32_t thread_count);
 extern ShThreadsStatus shCreateThread(uint32_t idx, void* p_func, uint32_t stack_size, ShThreadsHandle* p_handle);
 
 extern ShThreadsStatus shLaunchThreads(uint32_t first_thread, uint32_t thread_count, ShThreadParameters* p_parameters, ShThreadsHandle* p_handle);
+
+extern ShThreadsStatus shGetThreadState(uint32_t thread_idx, ShThreadState* p_state, ShThreadsHandle* p_handle);
+
+extern ShThreadsStatus shExitCurrentThread(uint32_t exit_code);
 
 extern ShThreadsStatus shWaitForThreads(uint32_t first_thread, uint32_t thread_count, uint64_t timeout, uint64_t* p_exit_codes, ShThreadsHandle* p_handle);
 

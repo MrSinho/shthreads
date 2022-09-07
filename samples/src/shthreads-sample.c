@@ -16,7 +16,7 @@ void* sample(sample_args* p_args) {
 	assert(p_args != NULL);
 
 	for (uint8_t i = 0; i < 3; i++) {
-		printf("thread %" PRIu64 ": power of %i: %i\n",
+		printf("\tthread %" PRIu64 ": power of %i: %i\n",
 			shGetCurrentThreadId(),
 			p_args->value,
 			p_args->value * p_args->value
@@ -29,7 +29,9 @@ void* sample(sample_args* p_args) {
 #endif//_WIN32
 	}
 
-	return (void*)p_args->value;
+	uint64_t return_value = (uint64_t)p_args->value;
+
+	return (void*)return_value;
 }
 
 
@@ -73,6 +75,20 @@ int main(void) {
 	status         = shLaunchThreads(0, 2, parameters, &handle);
 	assert(status == SH_THREADS_SUCCESS);
 
+	//                 //
+	//GET THREADS STATE//
+	//                 //
+	ShThreadState state_0 = SH_THREAD_INVALID_STATE;
+	ShThreadState state_1 = SH_THREAD_INVALID_STATE;
+	shGetThreadState(0, &state_0, &handle);
+	shGetThreadState(1, &state_1, &handle);
+	printf("\nThreads state: \n\tthread %" PRIu64 ": %s,\n\tthread %" PRIu64 ": %s\n\n",
+		handle.p_threads[0].id,
+		state_0 == SH_THREAD_RUNNING ? "RUNNING" : "RETURNED",
+		handle.p_threads[1].id,
+		state_1 == SH_THREAD_RUNNING ? "RUNNING" : "RETURNED"
+	);
+
 	//                   //
 	//WAIT END OF THREADS//
 	//                   //
@@ -80,10 +96,24 @@ int main(void) {
 	status                    = shWaitForThreads(0, 2, UINT64_MAX, return_values, &handle);
 	assert(status            == SH_THREADS_SUCCESS);
 
+	//                 //
+	//GET THREADS STATE//
+	//                 //
+	state_0 = SH_THREAD_INVALID_STATE;
+	state_1 = SH_THREAD_INVALID_STATE;
+	shGetThreadState(0, &state_0, &handle);
+	shGetThreadState(1, &state_1, &handle);
+	printf("\nThreads state: \n\tthread %" PRIu64 ": %s,\n\tthread %" PRIu64 ": %s\n\n",
+		handle.p_threads[0].id,
+		state_0 == SH_THREAD_RUNNING ? "RUNNING" : "RETURNED",
+		handle.p_threads[1].id,
+		state_1 == SH_THREAD_RUNNING ? "RUNNING" : "RETURNED"
+	);
+
 	//   //
 	//LOG//
 	//   //
-	printf("End of program\n return values:\n\tthread %" PRIu64 ": %" PRIu64 "\n\tthread %" PRIu64 ": %" PRIu64"\n", 
+	printf("End of program\n\treturn values:\n\tthread %" PRIu64 ": %" PRIu64 "\n\tthread %" PRIu64 ": %" PRIu64"\n\n", 
 		handle.p_threads[0].id,
 		return_values[0],
 		handle.p_threads[1].id,
