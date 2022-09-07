@@ -85,7 +85,6 @@ int main(void) {
 	status = shLaunchThreads(0, 2, parameters, &handle);
 	assert(status == SH_THREADS_SUCCESS);
 
-
 	//                   //
 	//WAIT END OF THREADS//
 	//                   //
