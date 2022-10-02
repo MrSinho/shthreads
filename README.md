@@ -1,6 +1,6 @@
 # shthreads
 
-Simple cross platform C multithreading library using the win32 API and POSIX.
+Simnple threading library using the win32 api. To do: linux threading with POSIX.
 
 ### Features
 * Create threads with the same code for every platform;
