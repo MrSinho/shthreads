@@ -2,10 +2,6 @@
 
 Simnple threading library using the win32 api. To do: linux threading with POSIX.
 
-### Features
-* Create threads with the same code for every platform;
-* Mutexes.
-
 ## Build
 
 Tested with `gcc` and `MSVC`. The project files and `Makefile`s are generated with cmake:
