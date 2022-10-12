@@ -7,6 +7,9 @@ extern "C" {
 
 #ifdef _WIN32
 #include <Windows.h>
+#else
+#include <unistd.h>
+#include <pthread.h>
 #endif//_WIN32
 
 #include <stdio.h>
@@ -17,6 +20,10 @@ typedef void* ShThreadParameters;
 #ifdef _WIN32
 typedef unsigned long ShThreadFunc(void*);
 typedef HANDLE ShMutex;
+#else
+typedef void* ShThreadFunc(void*);
+//to fix
+typedef pthread_mutex_t ShMutex;
 #endif//_WIN32
 
 #define SH_BUILD_THREAD_ARGS(struct_name, ...)\
@@ -64,16 +71,17 @@ typedef struct ShThread {
 
 
 typedef struct ShThreadsHandle {
-    ShThread* p_threads;
-    uint32_t  thread_count;
+    ShThread*   p_threads;
+    uint32_t    thread_count;
 
 #ifdef _WIN32
-    HANDLE* p_handles;
+    HANDLE*     p_handles;
 #else 
+	pthread_t*  p_handles;
 #endif//_WIN32
 
-    uint32_t mutex_count;
-    ShMutex* p_mutexes;
+    uint32_t   mutex_count;
+    ShMutex*   p_mutexes;
 
 } ShThreadsHandle;
 
@@ -81,6 +89,9 @@ typedef struct ShThreadsHandle {
 #define shGetCurrentThreadId()\
     (uint64_t)GetCurrentThreadId()
 #else
+//TO FIX
+#define shGetCurrentThreadId()\
+	(uint64_t)0
 #endif//_WIN32
 
 
@@ -107,19 +118,17 @@ extern ShMutex* shCreateMutexes(uint32_t mutex_count, ShThreadsHandle* p_handle)
 
 
 
-extern ShThreadsStatus shWaitForMutexes(uint32_t first_mutex, uint32_t mutex_count, uint32_t timeout, ShMutex* p_mutexes);
+extern ShThreadsStatus shWaitForMutexes(uint32_t first_mutex, uint32_t mutex_count, uint64_t timeout, ShMutex* p_mutexes);
 
 extern ShThreadsStatus shUnlockMutexes(uint32_t first_mutex, uint32_t mutex_count, ShMutex* p_mutexes);
 
 
 
-#ifndef shSleep
 #ifdef _WIN32
 #define shThreadsSleep(i_milliseconds) Sleep((DWORD)(i_milliseconds))
 #else
 #define shThreadsSleep(i_milliseconds) usleep((i_milliseconds) * 1000)
 #endif//_WIN32
-#endif//shSleep
 
 
 #ifdef __cplusplus

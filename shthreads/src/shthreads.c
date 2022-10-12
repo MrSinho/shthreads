@@ -14,7 +14,9 @@ ShThreadsHandle shAllocateThreads(uint32_t thread_count) {
         calloc(thread_count, sizeof(ShThread)),
         thread_count,
 #ifdef _WIN32
-        calloc(thread_count, sizeof(HANDLE)),
+        calloc(thread_count, sizeof(HANDLE))
+#else
+		calloc(thread_count, sizeof(pthread_t))
 #endif//_WIN32
     };
 }
@@ -117,7 +119,13 @@ ShThreadsStatus shExitCurrentThread(uint32_t return_value) {
 ShThreadsStatus shThreadsRelease(ShThreadsHandle* p_handle) {
     shThreadsError(p_handle            == NULL, "invalid thread memory",         return SH_INVALID_HANDLE_MEMORY);
     shThreadsError(p_handle->p_threads == NULL, "invalid threads memory",        return SH_INVALID_THREAD_MEMORY);
+#ifdef _WIN32
     shThreadsError(p_handle->p_handles == NULL, "invalid thread handles memory", return SH_INVALID_THREAD_HANDLE_MEMORY);
+#else
+//TO FIX
+	shThreadsError(p_handle == NULL, "invalid thread handles memory", return SH_INVALID_THREAD_HANDLE_MEMORY);
+#endif//_WIN32
+
 
 #ifdef _WIN32
     for (uint32_t thread_idx = 0; thread_idx < p_handle->thread_count; thread_idx++) {
@@ -129,7 +137,11 @@ ShThreadsStatus shThreadsRelease(ShThreadsHandle* p_handle) {
 #else
 #endif//_WIN32
 
+#ifdef _WIN32
     free(p_handle->p_handles);
+#else
+//TO FIX
+#endif//_WIN32
     free(p_handle->p_threads);
     free(p_handle->p_mutexes);
 
@@ -162,7 +174,7 @@ ShMutex* shCreateMutexes(uint32_t mutex_count, ShThreadsHandle* p_handle) {
     return p_handle->p_mutexes;
 }
 
-ShThreadsStatus shWaitForMutexes(uint32_t first_mutex, uint32_t mutex_count, uint32_t ms_timeout, ShMutex* p_mutexes) {
+ShThreadsStatus shWaitForMutexes(uint32_t first_mutex, uint32_t mutex_count, uint64_t ms_timeout, ShMutex* p_mutexes) {
     shThreadsError(p_mutexes == NULL, "invalid mutexes memory", return SH_INVALID_MUTEX_MEMORY);
 
 #ifdef _WIN32
@@ -187,10 +199,13 @@ ShThreadsStatus shUnlockMutexes(uint32_t first_mutex, uint32_t mutex_count, ShMu
     for (uint32_t mutex_idx = first_mutex; mutex_idx < (first_mutex + mutex_count); mutex_idx++) {
         unlock_status += (uint32_t)ReleaseMutex(p_mutexes[mutex_idx]);
     }
+    
+    return unlock_status == mutex_count ? SH_THREADS_SUCCESS : SH_MUTEX_UNLOCK_FAILURE;
 #else
+//TO FIX
+	return SH_THREADS_SUCCESS;
 #endif//_WIN32
 
-    return unlock_status == mutex_count ? SH_THREADS_SUCCESS : SH_MUTEX_UNLOCK_FAILURE;
 }
 
 

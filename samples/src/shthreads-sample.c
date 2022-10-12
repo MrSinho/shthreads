@@ -22,11 +22,7 @@ void* sample(sample_args* p_args) {
 			p_args->value * p_args->value
 		);
 		p_args->value *= p_args->value;
-#ifdef _WIN32
-		Sleep(1000);
-#else
-		sleep(1.0f);
-#endif//_WIN32
+		shThreadsSleep(1000);
 	}
 
 	uint64_t return_value = (uint64_t)p_args->value;
