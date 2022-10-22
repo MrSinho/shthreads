@@ -14,7 +14,7 @@ SH_BUILD_THREAD_ARGS(
 );
 void* sample(sample_args* p_args) {
 	assert(p_args != NULL);
-
+	shThreadsSleep(500);
 	for (uint8_t i = 0; i < 3; i++) {
 		printf("\tthread %" PRIu64 ": power of %i: %i\n",
 			shGetCurrentThreadId(),
@@ -34,10 +34,10 @@ void* sample(sample_args* p_args) {
 
 int main(void) {
 
-	//             //
-	//CREATE HANDLE//
-	//             //
-	ShThreadsHandle handle = shAllocateThreads(2);
+	//                  //
+	//CREATE THREAD POOL//
+	//                  //
+	ShThreadPool pool = shAllocateThreads(2);
 
 	//                  //
 	//INITIALIZE THREADS//   
@@ -46,7 +46,7 @@ int main(void) {
 		0,
 		sample,
 		1024,
-		&handle
+		&pool
 	);
 	assert(status == SH_THREADS_SUCCESS);
 
@@ -54,7 +54,7 @@ int main(void) {
 		1,
 		sample,
 		1024,
-		&handle
+		&pool
 	);
 	assert(status == SH_THREADS_SUCCESS);
 
@@ -68,7 +68,7 @@ int main(void) {
 	//           //
 	//RUN THREADS//
 	//           //
-	status         = shLaunchThreads(0, 2, parameters, &handle);
+	status         = shLaunchThreads(0, 2, parameters, &pool);
 	assert(status == SH_THREADS_SUCCESS);
 
 	//                 //
@@ -76,12 +76,12 @@ int main(void) {
 	//                 //
 	ShThreadState state_0 = SH_THREAD_INVALID_STATE;
 	ShThreadState state_1 = SH_THREAD_INVALID_STATE;
-	shGetThreadState(0, &state_0, &handle);
-	shGetThreadState(1, &state_1, &handle);
+	shGetThreadState(0, &state_0, &pool);
+	shGetThreadState(1, &state_1, &pool);
 	printf("\nThreads state: \n\tthread %" PRIu64 ": %s,\n\tthread %" PRIu64 ": %s\n\n",
-		handle.p_threads[0].id,
+		pool.p_threads[0].id,
 		state_0 == SH_THREAD_RUNNING ? "RUNNING" : "RETURNED",
-		handle.p_threads[1].id,
+		pool.p_threads[1].id,
 		state_1 == SH_THREAD_RUNNING ? "RUNNING" : "RETURNED"
 	);
 
@@ -89,7 +89,7 @@ int main(void) {
 	//WAIT END OF THREADS//
 	//                   //
 	uint64_t return_values[2] = {0};
-	status                    = shWaitForThreads(0, 2, UINT64_MAX, return_values, &handle);
+	status                    = shWaitForThreads(0, 2, UINT64_MAX, return_values, &pool);
 	assert(status            == SH_THREADS_SUCCESS);
 
 	//                 //
@@ -97,12 +97,12 @@ int main(void) {
 	//                 //
 	state_0 = SH_THREAD_INVALID_STATE;
 	state_1 = SH_THREAD_INVALID_STATE;
-	shGetThreadState(0, &state_0, &handle);
-	shGetThreadState(1, &state_1, &handle);
+	shGetThreadState(0, &state_0, &pool);
+	shGetThreadState(1, &state_1, &pool);
 	printf("\nThreads state: \n\tthread %" PRIu64 ": %s,\n\tthread %" PRIu64 ": %s\n\n",
-		handle.p_threads[0].id,
+		pool.p_threads[0].id,
 		state_0 == SH_THREAD_RUNNING ? "RUNNING" : "RETURNED",
-		handle.p_threads[1].id,
+		pool.p_threads[1].id,
 		state_1 == SH_THREAD_RUNNING ? "RUNNING" : "RETURNED"
 	);
 
@@ -110,16 +110,16 @@ int main(void) {
 	//LOG//
 	//   //
 	printf("End of program\n\treturn values:\n\tthread %" PRIu64 ": %" PRIu64 "\n\tthread %" PRIu64 ": %" PRIu64"\n\n", 
-		handle.p_threads[0].id,
+		pool.p_threads[0].id,
 		return_values[0],
-		handle.p_threads[1].id,
+		pool.p_threads[1].id,
 		return_values[1]
 	);
 
 	//                                //
 	//CLOSE THREADS AND RELEASE MEMORY//
 	//                                //
-	shThreadsRelease(&handle);
+	shThreadsRelease(&pool);
 
 
 

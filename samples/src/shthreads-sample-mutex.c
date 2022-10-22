@@ -44,10 +44,10 @@ void* sample(sample_args* p_args) {
 
 int main(void) {
 	
-	//             //
-	//CREATE HANDLE//
-	//             //
-	ShThreadsHandle handle = shAllocateThreads(2);
+	//                  //
+	//CREATE THREAD POOL//
+	//                  //
+	ShThreadPool pool = shAllocateThreads(2);
 
 
 	//                  //
@@ -57,21 +57,21 @@ int main(void) {
 		0,
 		sample,
 		1024,
-		&handle
+		&pool
 	);
 	assert(status == SH_THREADS_SUCCESS);
 	status = shCreateThread(
 		1,
 		sample,
 		1024,
-		&handle
+		&pool
 	);
 	assert(status == SH_THREADS_SUCCESS);
 
 	//            //
 	//CREATE MUTEX//
 	//            //
-	ShMutex* p_mutexes = shCreateMutexes(1, &handle);
+	ShMutex* p_mutexes = shCreateMutexes(1, &pool);
 
 	//                       //
 	//SETUP THREDS PARAMETERS//
@@ -82,20 +82,20 @@ int main(void) {
 	//           //
 	//RUN THREADS//
 	//           //
-	status = shLaunchThreads(0, 2, parameters, &handle);
+	status = shLaunchThreads(0, 2, parameters, &pool);
 	assert(status == SH_THREADS_SUCCESS);
 
 	//                   //
 	//WAIT END OF THREADS//
 	//                   //
 	uint64_t return_values[2] = { 0 };
-	status                    = shWaitForThreads(0, 2, UINT64_MAX, return_values, &handle);
+	status                    = shWaitForThreads(0, 2, UINT64_MAX, return_values, &pool);
 	assert(status            == SH_THREADS_SUCCESS);
 
 	//                                //
 	//CLOSE THREADS AND RELEASE MEMORY//
 	//                                //
-	shThreadsRelease(&handle);
+	shThreadsRelease(&pool);
 
 
 

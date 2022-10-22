@@ -18,6 +18,9 @@ add_library(shthreads shthreads/src/shthreads.c)
 target_include_directories(shthreads PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR}/shthreads/include
 )
+if (UNIX)
+target_link_libraries(shthreads pthread)
+endif(UNIX)
 set_target_properties(shthreads PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin
 )

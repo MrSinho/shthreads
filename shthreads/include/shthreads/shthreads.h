@@ -10,6 +10,7 @@ extern "C" {
 #else
 #include <unistd.h>
 #include <pthread.h>
+#include <errno.h>
 #endif//_WIN32
 
 #include <stdio.h>
@@ -22,7 +23,6 @@ typedef unsigned long ShThreadFunc(void*);
 typedef HANDLE ShMutex;
 #else
 typedef void* ShThreadFunc(void*);
-//to fix
 typedef pthread_mutex_t ShMutex;
 #endif//_WIN32
 
@@ -46,18 +46,23 @@ typedef enum ShThreadState {
 
 
 typedef enum ShThreadsStatus {
-    SH_THREADS_SUCCESS              =  1,
-    SH_THREADS_FAILURE              =  0,
-    SH_INVALID_HANDLE_MEMORY        = -1,
-    SH_INVALID_THREAD_MEMORY        = -2,
-    SH_INVALID_THREAD_HANDLE_MEMORY = -3,
-    SH_INVALID_FUNCTION_MEMORY      = -4,
-    SH_INVALID_THREAD_IDX           = -5,
-    SH_INVALID_MUTEX_MEMORY         = -6,
-    SH_MUTEX_UNLOCK_FAILURE         = -7,
-    SH_INVALID_EXIT_CODE_MEMORY     = -8,
-    SH_INVALID_THREAD_STATE_MEMORY  = -9,
-    SH_THREAD_STATE_FAILURE         = -10,
+    SH_THREADS_SUCCESS                =  1,
+    SH_THREADS_FAILURE                =  0,
+    SH_INVALID_THREAD_POOL_MEMORY     = -1,
+    SH_INVALID_THREAD_MEMORY          = -2,
+    SH_INVALID_THREAD_HANDLE_MEMORY   = -3,
+    SH_INVALID_FUNCTION_MEMORY        = -4,
+    SH_INVALID_THREAD_IDX             = -5,
+    SH_INVALID_MUTEX_MEMORY           = -6,
+    SH_MUTEX_UNLOCK_FAILURE           = -7,
+    SH_INVALID_EXIT_CODE_MEMORY       = -8,
+    SH_INVALID_THREAD_STATE_MEMORY    = -9,
+    SH_THREAD_STATE_FAILURE           = -10,
+    SH_THREAD_INVALID_ATTRIBS_MEMORY  = -11,
+    SH_THREAD_UNIX_THREAD_FAILURE     = -12,
+    SH_THREADS_WAIT_FAILURE           = -13,
+    SH_INVALID_THREADS_RANGE          = -14,
+    SH_INVALID_MUTEX_RANGE            = -15
 } ShThreadsStatus;
 
 
@@ -70,51 +75,51 @@ typedef struct ShThread {
 
 
 
-typedef struct ShThreadsHandle {
-    ShThread*   p_threads;
-    uint32_t    thread_count;
+typedef struct ShThreadPool {
+    ShThread*       p_threads;
+    uint32_t        thread_count;
 
 #ifdef _WIN32
-    HANDLE*     p_handles;
+    HANDLE*         p_handles;
 #else 
-	pthread_t*  p_handles;
+	pthread_t*      p_handles;
+    pthread_attr_t* p_handle_attribs;
 #endif//_WIN32
 
-    uint32_t   mutex_count;
-    ShMutex*   p_mutexes;
+    uint32_t        mutex_count;
+    ShMutex*        p_mutexes;
 
-} ShThreadsHandle;
+} ShThreadPool;
 
 #ifdef _WIN32
 #define shGetCurrentThreadId()\
     (uint64_t)GetCurrentThreadId()
 #else
-//TO FIX
 #define shGetCurrentThreadId()\
-	(uint64_t)0
+	(uint64_t)pthread_self()
 #endif//_WIN32
 
 
 
-extern ShThreadsHandle shAllocateThreads(uint32_t thread_count);
+extern ShThreadPool shAllocateThreads(uint32_t thread_count);
 
 
 
-extern ShThreadsStatus shCreateThread(uint32_t idx, void* p_func, uint32_t stack_size, ShThreadsHandle* p_handle);
+extern ShThreadsStatus shCreateThread(uint32_t idx, void* p_func, uint32_t stack_size, ShThreadPool* p_pool);
 
-extern ShThreadsStatus shLaunchThreads(uint32_t first_thread, uint32_t thread_count, ShThreadParameters* p_parameters, ShThreadsHandle* p_handle);
+extern ShThreadsStatus shLaunchThreads(uint32_t first_thread, uint32_t thread_count, ShThreadParameters* p_parameters, ShThreadPool* p_pool);
 
-extern ShThreadsStatus shGetThreadState(uint32_t thread_idx, ShThreadState* p_state, ShThreadsHandle* p_handle);
+extern ShThreadsStatus shGetThreadState(uint32_t thread_idx, ShThreadState* p_state, ShThreadPool* p_pool);
 
 extern ShThreadsStatus shExitCurrentThread(uint32_t exit_code);
 
-extern ShThreadsStatus shWaitForThreads(uint32_t first_thread, uint32_t thread_count, uint64_t timeout, uint64_t* p_exit_codes, ShThreadsHandle* p_handle);
+extern ShThreadsStatus shWaitForThreads(uint32_t first_thread, uint32_t thread_count, uint64_t timeout, uint64_t* p_exit_codes, ShThreadPool* p_pool);
 
-extern ShThreadsStatus shThreadsRelease(ShThreadsHandle* p_handle);
+extern ShThreadsStatus shThreadsRelease(ShThreadPool* p_pool);
 
 
 
-extern ShMutex* shCreateMutexes(uint32_t mutex_count, ShThreadsHandle* p_handle);
+extern ShMutex* shCreateMutexes(uint32_t mutex_count, ShThreadPool* p_pool);
 
 
 
