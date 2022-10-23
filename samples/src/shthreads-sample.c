@@ -37,12 +37,15 @@ int main(void) {
 	//                  //
 	//CREATE THREAD POOL//
 	//                  //
-	ShThreadPool pool = shAllocateThreads(2);
+	ShThreadPool pool = { 0 };
+	ShThreadsStatus status = shAllocateThreads(2, &pool);
+	assert(status == SH_THREADS_SUCCESS);
+
 
 	//                  //
 	//INITIALIZE THREADS//   
 	//                  //
-	ShThreadsStatus status = shCreateThread(
+	status = shCreateThread(
 		0,
 		sample,
 		1024,
@@ -119,7 +122,7 @@ int main(void) {
 	//                                //
 	//CLOSE THREADS AND RELEASE MEMORY//
 	//                                //
-	shThreadsRelease(&pool);
+	status = shReleaseThreads(&pool);
 
 
 

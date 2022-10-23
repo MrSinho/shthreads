@@ -62,7 +62,9 @@ typedef enum ShThreadsStatus {
     SH_THREAD_UNIX_THREAD_FAILURE     = -12,
     SH_THREADS_WAIT_FAILURE           = -13,
     SH_INVALID_THREADS_RANGE          = -14,
-    SH_INVALID_MUTEX_RANGE            = -15
+    SH_INVALID_MUTEX_RANGE            = -15,
+    SH_INVALID_MUTEX_POOL_MEMORY      = -16,
+    SH_MUTEX_LOCK_FAILURE             = -17
 } ShThreadsStatus;
 
 
@@ -86,9 +88,6 @@ typedef struct ShThreadPool {
     pthread_attr_t* p_handle_attribs;
 #endif//_WIN32
 
-    uint32_t        mutex_count;
-    ShMutex*        p_mutexes;
-
 } ShThreadPool;
 
 #ifdef _WIN32
@@ -101,9 +100,7 @@ typedef struct ShThreadPool {
 
 
 
-extern ShThreadPool shAllocateThreads(uint32_t thread_count);
-
-
+extern ShThreadsStatus shAllocateThreads(uint32_t thread_count, ShThreadPool* p_pool);
 
 extern ShThreadsStatus shCreateThread(uint32_t idx, void* p_func, uint32_t stack_size, ShThreadPool* p_pool);
 
@@ -111,21 +108,28 @@ extern ShThreadsStatus shLaunchThreads(uint32_t first_thread, uint32_t thread_co
 
 extern ShThreadsStatus shGetThreadState(uint32_t thread_idx, ShThreadState* p_state, ShThreadPool* p_pool);
 
-extern ShThreadsStatus shExitCurrentThread(uint32_t exit_code);
+extern ShThreadsStatus shExitCurrentThread(uint64_t return_value);
 
 extern ShThreadsStatus shWaitForThreads(uint32_t first_thread, uint32_t thread_count, uint64_t timeout, uint64_t* p_exit_codes, ShThreadPool* p_pool);
 
-extern ShThreadsStatus shThreadsRelease(ShThreadPool* p_pool);
+extern ShThreadsStatus shReleaseThreads(ShThreadPool* p_pool);
 
 
 
-extern ShMutex* shCreateMutexes(uint32_t mutex_count, ShThreadPool* p_pool);
+typedef struct ShMutexPool {
+    ShMutex* p_mutexes;
+    uint32_t mutex_count;
+} ShMutexPool;
 
 
 
-extern ShThreadsStatus shWaitForMutexes(uint32_t first_mutex, uint32_t mutex_count, uint64_t timeout, ShMutex* p_mutexes);
+extern ShThreadsStatus shAllocateMutexes(uint32_t mutex_count, ShMutexPool* p_pool);
 
-extern ShThreadsStatus shUnlockMutexes(uint32_t first_mutex, uint32_t mutex_count, ShMutex* p_mutexes);
+extern ShThreadsStatus shWaitForMutexes(uint32_t first_mutex, uint32_t mutex_count, uint64_t ms_timeout, ShMutexPool* p_pool);
+
+extern ShThreadsStatus shUnlockMutexes(uint32_t first_mutex, uint32_t mutex_count, ShMutexPool* p_pool);
+
+extern ShThreadsStatus shReleaseMutexes(ShMutexPool* p_pool);
 
 
 
