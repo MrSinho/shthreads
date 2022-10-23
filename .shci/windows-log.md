@@ -7,7 +7,7 @@
 
         
 
-Build ran for `35.90s`
+Build ran for `37.14s`
 
 ---
 
@@ -61,7 +61,7 @@ Warnings:
 cd shthreads
 mkdir build
 cd build 
-cmake ..
+cmake .. -DSH_THREADS_BUILD_SAMPLES=ON
 cmake --build .
 ```
 
@@ -84,6 +84,15 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   Building Custom Rule C:/Users/sino3/Desktop/shci-test/shthreads/shthreads/CMakeLists.txt
   shthreads.c
   shthreads.vcxproj -> C:\Users\sino3\Desktop\shci-test\shthreads\shthreads\bin\Debug\shthreads.lib
+  Building Custom Rule C:/Users/sino3/Desktop/shci-test/shthreads/shthreads/CMakeLists.txt
+  shthreads-sample.c
+  shthreads-sample.vcxproj -> C:\Users\sino3\Desktop\shci-test\shthreads\shthreads\bin\Debug\shthreads-sample.exe
+  Building Custom Rule C:/Users/sino3/Desktop/shci-test/shthreads/shthreads/CMakeLists.txt
+  shthreads-sample-mutex.c
+  shthreads-sample-mutex.vcxproj -> C:\Users\sino3\Desktop\shci-test\shthreads\shthreads\bin\Debug\shthreads-sample-mutex.exe
+  Building Custom Rule C:/Users/sino3/Desktop/shci-test/shthreads/shthreads/CMakeLists.txt
+  shthreads-sample-semaphore.c
+  shthreads-sample-semaphore.vcxproj -> C:\Users\sino3\Desktop\shci-test\shthreads\shthreads\build\Debug\shthreads-sample-semaphore.exe
   Building Custom Rule C:/Users/sino3/Desktop/shci-test/shthreads/shthreads/CMakeLists.txt
 
 ```
