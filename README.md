@@ -1,6 +1,12 @@
 # shthreads
 
-Simnple threading library using the win32 api. To do: linux threading with POSIX.
+[![linux_build](.shci/linux-exit_code.svg)](.shci/linux-log.md) [![windows-build](.shci/windows-exit_code.svg)](.shci/windows-log.md)
+
+A simple Windows and Unix threading library using the win32 api and posix.
+
+## Features
+ * Threads handling
+ * Mutex synchronization
 
 ## Build
 
