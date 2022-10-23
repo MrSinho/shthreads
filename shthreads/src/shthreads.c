@@ -194,15 +194,20 @@ ShThreadsStatus shReleaseThreads(ShThreadPool* p_pool) {
     for (uint32_t thread_idx = 0; thread_idx < p_pool->thread_count; thread_idx++) {
         CloseHandle(p_pool->p_handles[thread_idx]);
     }
+    free(p_pool->p_handles);
+    p_pool->p_handles = NULL;
 #else
     for (uint32_t thread_idx = 0; thread_idx < p_pool->thread_count; thread_idx++) {
         
     }
     free(p_pool->p_handles);
+    p_pool->p_handles = NULL;
     free(p_pool->p_handle_attribs);
+    p_pool->p_handle_attribs = NULL;
 #endif//_WIN32
 
     free(p_pool->p_threads);
+    p_pool->p_threads = NULL;
     p_pool->thread_count = 0;
 
     return SH_THREADS_SUCCESS;
@@ -306,6 +311,7 @@ ShThreadsStatus shReleaseMutexes(ShMutexPool* p_pool) {
 #endif//_WIN32
 
     free(p_pool->p_mutexes);
+    p_pool->p_mutexes = NULL;
     p_pool->mutex_count = 0;
 
     return SH_THREADS_SUCCESS;
