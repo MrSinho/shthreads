@@ -19,7 +19,7 @@ mkdir build && cd build
 cmake .. #-DSH_THREADS_BUILD_SAMPLES=ON
 ```
 
-If you've encountered some errors while trying to build the code, check the +linux](.shci/linux-log.md) and [windows](.shci/windows-log.md) build [logs](.shci/).
+If you've encountered some errors while trying to build the code, check the [linux](.shci/linux-log.md) and [windows](.shci/windows-log.md) build [logs](.shci/).
 
 ## Example code
 
