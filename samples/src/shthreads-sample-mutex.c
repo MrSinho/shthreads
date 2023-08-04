@@ -92,6 +92,7 @@ int main(void) {
 	//                       //
 	//SETUP THREDS PARAMETERS//
 	//                       //
+
 	uint32_t           shared_value  = 0;
 	sample_args        args_0        = { &shared_value, mutex }; //shared memory block { uint32_t shared_value, ShMutex mutex }
 	sample_args        args_1        = { &shared_value, mutex }; //shared memory block { uint32_t shared_value, ShMutex mutex }
