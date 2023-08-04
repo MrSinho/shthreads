@@ -31,7 +31,7 @@ void* sample(sample_args* p_args) {
 
 		if ((*p_args->p_shared_value) >= 100000) { 
 			shUnlockMutexes(0, 1, &p_args->mutex); 
-			break; 
+			break;
 		}
 
 		printf("\tthread %" PRIi64 "\t\t: %" PRIi32 " + 1 : \t\t%" PRIi32 "\n",
@@ -86,15 +86,15 @@ int main(void) {
 	//CREATE MUTEX//
 	//            //
 	ShMutex mutex = SH_THREADS_NULL_MUTEX;
-	status = shAllocateMutexes(1, &mutex);
+	status = shCreateMutexes(1, &mutex);
 	assert(status == SH_THREADS_SUCCESS);
 
 	//                       //
 	//SETUP THREDS PARAMETERS//
 	//                       //
 	uint32_t           shared_value  = 0;
-	sample_args        args_0        = { &shared_value, mutex }; //shared memory block { uint64_t value, ShMutexPool mutex_pool }
-	sample_args        args_1        = { &shared_value, mutex }; //shared memory block { uint64_t value, ShMutexPool mutex_pool }
+	sample_args        args_0        = { &shared_value, mutex }; //shared memory block { uint32_t shared_value, ShMutex mutex }
+	sample_args        args_1        = { &shared_value, mutex }; //shared memory block { uint32_t shared_value, ShMutex mutex }
 	ShThreadParameters parameters[2] = { &args_0, &args_1 };     //use same memory for both threads
 
 	//           //

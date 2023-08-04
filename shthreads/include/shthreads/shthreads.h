@@ -141,7 +141,7 @@ extern ShThreadsStatus shReleaseThreads(
 
 
 
-extern ShThreadsStatus shAllocateMutexes(
+extern ShThreadsStatus shCreateMutexes(
     uint32_t mutex_count, 
     ShMutex* p_mutexes
 );

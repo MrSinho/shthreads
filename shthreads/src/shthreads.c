@@ -232,7 +232,7 @@ ShThreadsStatus shReleaseThreads(
 }
 
 
-ShThreadsStatus shAllocateMutexes(
+ShThreadsStatus shCreateMutexes(
     uint32_t mutex_count, 
     ShMutex* p_mutexes
 ) {
