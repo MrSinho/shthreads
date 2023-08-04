@@ -11,11 +11,14 @@ extern "C" {
 
 
 
-SH_BUILD_THREAD_ARGS(
-	sample_args, uint64_t value; ShMutexPool mutex_pool
-);
+typedef struct sample_args {
+	uint32_t* p_shared_value;
+	ShMutex   mutex;
+} sample_args;
+
 void* sample(sample_args* p_args) {
-	assert(p_args != NULL);
+	assert(p_args                 != NULL);
+	assert(p_args->p_shared_value != NULL);
 
 	printf("thread %" PRIi64 " starting...\n",
 		shGetCurrentThreadId()
@@ -23,19 +26,24 @@ void* sample(sample_args* p_args) {
 
 	for (;;) {
 
-		ShThreadsStatus status = shWaitForMutexes(0, 1, UINT64_MAX, &p_args->mutex_pool);
+		ShThreadsStatus status = shWaitForMutexes(0, 1, UINT64_MAX, &p_args->mutex);
 		assert(status == SH_THREADS_SUCCESS);
 
-		if (p_args->value >= 1000000) { shUnlockMutexes(0, 1, &p_args->mutex_pool); break; }
+		if ((*p_args->p_shared_value) >= 100000) { 
+			shUnlockMutexes(0, 1, &p_args->mutex); 
+			break; 
+		}
 
-		printf("\tthread %" PRIi64 ": %" PRIi64 " + 1: %" PRIi64 "\n",
+		printf("\tthread %" PRIi64 "\t\t: %" PRIi32 " + 1 : \t\t%" PRIi32 "\n",
 			shGetCurrentThreadId(),
-			p_args->value,
-			p_args->value + 1
+			(*p_args->p_shared_value),
+			(*p_args->p_shared_value) + 1
 		);
-		p_args->value++;
 
-		status = shUnlockMutexes(0, 1, &p_args->mutex_pool);
+		(*p_args->p_shared_value)++;
+
+		status = shUnlockMutexes(0, 1, &p_args->mutex);
+
 		assert(status == SH_THREADS_SUCCESS);
 	}
 
@@ -49,9 +57,11 @@ int main(void) {
 	//                  //
 	//CREATE THREAD POOL//
 	//                  //
-	ShThreadPool pool = { 0 };
+	ShThreadPool    pool   = { 0 };
 	ShThreadsStatus status = shAllocateThreads(2, &pool);
-	assert(status == SH_THREADS_SUCCESS);
+
+	assert(status         == SH_THREADS_SUCCESS);
+	assert(pool.p_threads != NULL);
 
 
 	//                  //
@@ -75,16 +85,17 @@ int main(void) {
 	//            //
 	//CREATE MUTEX//
 	//            //
-	ShMutexPool mutex_pool = { 0 };
-	status = shAllocateMutexes(1, &mutex_pool);
+	ShMutex mutex = SH_THREADS_NULL_MUTEX;
+	status = shAllocateMutexes(1, &mutex);
 	assert(status == SH_THREADS_SUCCESS);
-	assert(mutex_pool.p_mutexes != NULL);
 
 	//                       //
 	//SETUP THREDS PARAMETERS//
 	//                       //
-	sample_args        args_0        = { 2, mutex_pool };    //shared memory block { uint64_t value, ShMutexPool mutex_pool }
-	ShThreadParameters parameters[2] = { &args_0, &args_0 }; //use same memory for both threads
+	uint32_t           shared_value  = 0;
+	sample_args        args_0        = { &shared_value, mutex }; //shared memory block { uint64_t value, ShMutexPool mutex_pool }
+	sample_args        args_1        = { &shared_value, mutex }; //shared memory block { uint64_t value, ShMutexPool mutex_pool }
+	ShThreadParameters parameters[2] = { &args_0, &args_1 };     //use same memory for both threads
 
 	//           //
 	//RUN THREADS//
@@ -103,7 +114,7 @@ int main(void) {
 	//CLOSE THREADS AND RELEASE MEMORY//
 	//                                //
 	status = shReleaseThreads(&pool);
-	status = shReleaseMutexes(&mutex_pool);
+	status = shReleaseMutexes(0, 1, &mutex);
 
 
 #ifdef _WIN32

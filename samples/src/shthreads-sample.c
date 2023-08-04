@@ -9,9 +9,10 @@ extern "C" {
 
 
 
-SH_BUILD_THREAD_ARGS(
-	sample_args, uint32_t value
-);
+typedef struct sample_args {
+	uint32_t value;
+} sample_args;
+
 void* sample(sample_args* p_args) {
 	assert(p_args != NULL);
 	shThreadsSleep(500);
@@ -37,10 +38,11 @@ int main(void) {
 	//                  //
 	//CREATE THREAD POOL//
 	//                  //
-	ShThreadPool pool = { 0 };
+	ShThreadPool    pool   = { 0 };
 	ShThreadsStatus status = shAllocateThreads(2, &pool);
-	assert(status == SH_THREADS_SUCCESS);
-
+	
+	assert(status         == SH_THREADS_SUCCESS);
+	assert(pool.p_threads != NULL);
 
 	//                  //
 	//INITIALIZE THREADS//   

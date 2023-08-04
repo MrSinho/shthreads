@@ -57,3 +57,5 @@ build/*
 bin/*
 win-build/*
 unix-build/*
+windows/*
+linux/*

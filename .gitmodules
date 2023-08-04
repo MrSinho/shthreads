@@ -1,0 +1,3 @@
+[submodule ".shci/shci"]
+	path = .shci/shci
+	url = https://github.com/mrsinho/shci

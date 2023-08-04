@@ -1,0 +1,9 @@
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /mnt/d/home/Desktop/GitHub/shthreads/linux
+[ 33%] Built target shthreads
+Scanning dependencies of target shthreads-sample-mutex
+[ 50%] Building C object CMakeFiles/shthreads-sample-mutex.dir/samples/src/shthreads-sample-mutex.c.o
+[ 66%] Linking C executable ../bin/shthreads-sample-mutex
+[ 66%] Built target shthreads-sample-mutex
+[100%] Built target shthreads-sample

@@ -1,0 +1,11 @@
+-- Selecting Windows SDK version 10.0.22000.0 to target Windows 10.0.22621.
+-- Configuring done (0.1s)
+-- Generating done (0.2s)
+-- Build files have been written to: D:/home/desktop/GitHub/shthreads/windows
+MSBuild version 17.6.3+07e294721 for .NET Framework
+
+  shthreads.vcxproj -> D:\home\desktop\GitHub\shthreads\bin\Debug\shthreads.lib
+  shthreads-sample.vcxproj -> D:\home\desktop\GitHub\shthreads\bin\Debug\shthreads-sample.exe
+  shthreads-sample-mutex.c
+  shthreads-sample-mutex.vcxproj -> D:\home\desktop\GitHub\shthreads\bin\Debug\shthreads-sample-mutex.exe
+  Building Custom Rule D:/home/desktop/GitHub/shthreads/CMakeLists.txt
